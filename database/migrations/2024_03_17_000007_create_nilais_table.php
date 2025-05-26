@@ -10,14 +10,15 @@ return new class extends Migration
     {
         Schema::create('nilais', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('krs_id')->constrained()->onDelete('cascade');
-            $table->decimal('nilai_tugas', 5, 2)->nullable();
-            $table->decimal('nilai_uts', 5, 2)->nullable();
-            $table->decimal('nilai_uas', 5, 2)->nullable();
-            $table->decimal('nilai_akhir', 5, 2)->nullable();
-            $table->string('grade')->nullable();
+            $table->foreignId('krs_id')->constrained('krs')->onDelete('cascade');
+            $table->decimal('nilai_angka', 5, 2);
+            $table->string('nilai_huruf', 2);
+            $table->decimal('nilai_indeks', 3, 2);
             $table->text('keterangan')->nullable();
             $table->timestamps();
+
+            // Prevent duplicate entries
+            $table->unique(['krs_id']);
         });
     }
 

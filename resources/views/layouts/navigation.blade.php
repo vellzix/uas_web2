@@ -12,9 +12,21 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    @if(auth()->user()->role === 'admin')
+                    @if (Auth::user()->role === 'admin')
                         <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                             {{ __('Dashboard') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('admin.mahasiswa.index')" :active="request()->routeIs('admin.mahasiswa.*')">
+                            {{ __('Mahasiswa') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('admin.dosen.index')" :active="request()->routeIs('admin.dosen.*')">
+                            {{ __('Dosen') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('admin.matakuliah.index')" :active="request()->routeIs('admin.matakuliah.*')">
+                            {{ __('Mata Kuliah') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('admin.periode-akademik.index')" :active="request()->routeIs('admin.periode-akademik.*')">
+                            {{ __('Periode Akademik') }}
                         </x-nav-link>
                     @elseif(auth()->user()->role === 'dosen')
                         <x-nav-link :href="route('dosen.dashboard')" :active="request()->routeIs('dosen.dashboard')">

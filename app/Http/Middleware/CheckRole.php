@@ -17,11 +17,11 @@ class CheckRole
         $user = Auth::user();
         
         foreach($roles as $role) {
-            if($user->hasRole($role)) {
+            if($user->role === $role) {
                 return $next($request);
             }
         }
 
-        return redirect('/')->with('error', 'Unauthorized access.');
+        abort(403, 'Unauthorized. You do not have the required role to access this page.');
     }
 } 

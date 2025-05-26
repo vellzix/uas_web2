@@ -9,18 +9,20 @@ class Jadwal extends Model
 {
     use HasFactory;
 
+    protected $table = 'jadwal';
+
     protected $fillable = [
         'matakuliah_id',
         'dosen_id',
-        'semester',
-        'tahun_ajaran',
-        'kelas',
         'hari',
         'jam_mulai',
         'jam_selesai',
         'ruangan',
-        'kapasitas',
+        'semester',
+        'tahun_akademik',
         'status',
+        'kapasitas',
+        'terisi',
     ];
 
     protected $casts = [
@@ -40,7 +42,7 @@ class Jadwal extends Model
 
     public function krs()
     {
-        return $this->hasMany(KRS::class);
+        return $this->hasMany(Krs::class);
     }
 
     public function presensi()

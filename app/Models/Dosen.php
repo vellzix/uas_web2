@@ -17,6 +17,11 @@ class Dosen extends Model
         'bidang',
         'foto',
         'status',
+        'no_hp',
+        'tempat_lahir',
+        'tanggal_lahir',
+        'jenis_kelamin',
+        'agama'
     ];
 
     public function user()

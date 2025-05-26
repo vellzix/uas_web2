@@ -94,8 +94,8 @@
                             @forelse($tugas_pending as $tugas)
                             <div class="border-l-4 border-yellow-500 pl-4">
                                 <div class="text-lg font-medium">{{ $tugas->judul }}</div>
-                                <div class="text-sm text-gray-600">{{ $tugas->matakuliah->nama }} - {{ $tugas->kelas }}</div>
-                                <div class="text-sm text-gray-500">{{ $tugas->pengumpulan->where('status', 'submitted')->count() }} mahasiswa menunggu penilaian</div>
+                                <div class="text-sm text-gray-600">{{ $tugas->jadwal->matakuliah->nama }}</div>
+                                <div class="text-sm text-gray-500">{{ $tugas->tugasMahasiswa->where('status', 'submitted')->count() }} mahasiswa menunggu penilaian</div>
                             </div>
                             @empty
                             <p class="text-gray-500 text-center">Tidak ada tugas yang perlu dinilai</p>

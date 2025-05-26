@@ -9,13 +9,12 @@ class KRS extends Model
 {
     use HasFactory;
 
+    protected $table = 'krs';
+
     protected $fillable = [
         'mahasiswa_id',
         'jadwal_id',
-        'semester',
-        'tahun_ajaran',
-        'status',
-        'keterangan',
+        'periode_akademik_id'
     ];
 
     public function mahasiswa()
@@ -26,6 +25,11 @@ class KRS extends Model
     public function jadwal()
     {
         return $this->belongsTo(Jadwal::class);
+    }
+
+    public function periodeAkademik()
+    {
+        return $this->belongsTo(PeriodeAkademik::class);
     }
 
     public function nilai()

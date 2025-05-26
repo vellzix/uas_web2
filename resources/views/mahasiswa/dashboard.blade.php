@@ -1,8 +1,18 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard Mahasiswa') }}
-        </h2>
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ __('Dashboard Mahasiswa') }}
+            </h2>
+            @if($is_periode_krs)
+            <a href="{{ route('mahasiswa.krs.form') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                Isi KRS
+            </a>
+            @endif
+        </div>
     </x-slot>
 
     <div class="py-12">
@@ -30,6 +40,36 @@
                 </div>
             </div>
 
+            <!-- Pengumuman -->
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold mb-4">Pengumuman Terbaru</h3>
+                    <div class="space-y-4">
+                        @forelse($pengumuman as $p)
+                        <div class="border-l-4 {{ $p->tipe === 'mahasiswa' ? 'border-blue-500' : 'border-gray-500' }} pl-4">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="text-lg font-medium">{{ $p->judul }}</h4>
+                                    <p class="text-gray-600 mt-1">{{ $p->isi }}</p>
+                                </div>
+                                <span class="text-sm text-gray-500">{{ $p->created_at->format('d M Y') }}</span>
+                            </div>
+                            <div class="mt-2 flex items-center space-x-4">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $p->tipe === 'mahasiswa' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800' }}">
+                                    {{ ucfirst($p->tipe) }}
+                                </span>
+                                <span class="text-sm text-gray-500">
+                                    Berlaku: {{ $p->tanggal_mulai->format('d M Y') }} - {{ $p->tanggal_selesai->format('d M Y') }}
+                                </span>
+                            </div>
+                        </div>
+                        @empty
+                        <p class="text-gray-500 text-center">Tidak ada pengumuman terbaru</p>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+
             <!-- Status Akademik -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -48,7 +88,9 @@
                     <div class="p-6">
                         <div class="text-gray-500 text-sm">IPK</div>
                         <div class="text-3xl font-bold">{{ number_format($ipk, 2) }}</div>
-                        <div class="text-sm text-gray-500">Total SKS: {{ $total_sks }}</div>
+                        <div class="text-sm text-gray-500">
+                            SKS Lulus: {{ $total_sks }} | Total SKS: {{ $total_sks_diambil }}
+                        </div>
                     </div>
                 </div>
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">

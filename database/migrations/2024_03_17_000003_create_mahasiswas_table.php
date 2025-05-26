@@ -14,7 +14,11 @@ return new class extends Migration
             $table->foreignId('prodi_id')->constrained()->onDelete('restrict');
             $table->string('nim')->unique();
             $table->string('nama');
-            $table->integer('semester');
+            $table->string('no_hp');
+            $table->string('tempat_lahir');
+            $table->date('tanggal_lahir');
+            $table->enum('jenis_kelamin', ['L', 'P']);
+            $table->string('agama');
             $table->year('angkatan');
             $table->string('foto')->nullable();
             $table->enum('status', ['aktif', 'cuti', 'lulus', 'do'])->default('aktif');

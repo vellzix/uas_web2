@@ -13,6 +13,9 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        
+        <!-- Flowbite -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">
@@ -26,6 +29,13 @@
                     </div>
                 </header>
             @endif
+
+            <!-- Admin Navigation -->
+            @auth
+                @if(auth()->user()->hasRole('admin'))
+                    @include('components.admin-nav')
+                @endif
+            @endauth
 
             <!-- Page Content -->
             <main>
@@ -53,5 +63,11 @@
                 {{ session('error') }}
             </div>
         @endif
+
+        <!-- Flowbite JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+        
+        <!-- Stack Scripts -->
+        @stack('scripts')
     </body>
 </html>

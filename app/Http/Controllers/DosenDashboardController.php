@@ -35,7 +35,7 @@ class DosenDashboardController extends Controller
                 ->get(),
             'tugas_pending' => Tugas::whereHas('jadwal', function($query) use ($dosen) {
                 $query->where('dosen_id', $dosen->id);
-            })->whereHas('pengumpulan', function($query) {
+            })->whereHas('tugasMahasiswa', function($query) {
                 $query->where('status', 'submitted');
             })->where('status', 'belum_dinilai')
             ->get(),

@@ -9,6 +9,8 @@ class Tugas extends Model
 {
     use HasFactory;
 
+    protected $table = 'tugas';
+
     protected $fillable = [
         'jadwal_id',
         'judul',
@@ -20,6 +22,7 @@ class Tugas extends Model
 
     protected $casts = [
         'deadline' => 'datetime',
+        'bobot' => 'decimal:2',
     ];
 
     public function jadwal()
@@ -27,7 +30,7 @@ class Tugas extends Model
         return $this->belongsTo(Jadwal::class);
     }
 
-    public function pengumpulan()
+    public function tugasMahasiswa()
     {
         return $this->hasMany(TugasMahasiswa::class);
     }

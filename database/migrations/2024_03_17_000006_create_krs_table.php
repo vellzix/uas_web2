@@ -10,16 +10,14 @@ return new class extends Migration
     {
         Schema::create('krs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('mahasiswa_id')->constrained()->onDelete('cascade');
-            $table->foreignId('jadwal_id')->constrained()->onDelete('restrict');
-            $table->string('semester');
-            $table->string('tahun_ajaran');
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
-            $table->text('keterangan')->nullable();
+            $table->foreignId('mahasiswa_id')->constrained('mahasiswas')->onDelete('cascade');
+            $table->foreignId('jadwal_id')->constrained('jadwal')->onDelete('cascade');
+            $table->foreignId('periode_akademik_id')->constrained('periode_akademik')->onDelete('cascade');
+            $table->enum('status', ['pending', 'disetujui', 'ditolak'])->default('pending');
             $table->timestamps();
 
-            // Mencegah mahasiswa mengambil jadwal yang sama
-            $table->unique(['mahasiswa_id', 'jadwal_id']);
+            // Prevent duplicate entries
+            $table->unique(['mahasiswa_id', 'jadwal_id', 'periode_akademik_id']);
         });
     }
 
