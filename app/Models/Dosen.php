@@ -13,15 +13,15 @@ class Dosen extends Model
         'user_id',
         'nip',
         'nama',
-        'prodi_id',
-        'bidang',
-        'foto',
-        'status',
         'no_hp',
         'tempat_lahir',
         'tanggal_lahir',
         'jenis_kelamin',
-        'agama'
+        'agama',
+        'prodi_id',
+        'matakuliah_id',
+        'foto',
+        'status',
     ];
 
     public function user()
@@ -42,5 +42,10 @@ class Dosen extends Model
     public function krs()
     {
         return $this->hasManyThrough(KRS::class, Jadwal::class);
+    }
+
+    public function matakuliah()
+    {
+        return $this->belongsTo(Matakuliah::class);
     }
 }

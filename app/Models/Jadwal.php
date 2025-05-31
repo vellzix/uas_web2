@@ -37,12 +37,12 @@ class Jadwal extends Model
 
     public function dosen()
     {
-        return $this->belongsTo(Dosen::class);
+        return $this->belongsTo(Dosen::class, 'dosen_id');
     }
 
     public function krs()
     {
-        return $this->hasMany(Krs::class);
+        return $this->hasMany(KRS::class);
     }
 
     public function presensi()

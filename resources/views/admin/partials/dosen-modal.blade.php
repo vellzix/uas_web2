@@ -1,6 +1,7 @@
 <!-- Modal Dosen -->
-<div id="dosenModal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
-    <div class="relative w-full max-w-2xl max-h-full">
+<div id="dosenModal" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="fixed inset-0 bg-black bg-opacity-50"></div>
+    <div class="relative w-full max-w-2xl max-h-full mx-auto mt-10">
         <!-- Modal content -->
         <div class="relative bg-white rounded-lg shadow">
             <!-- Modal header -->
@@ -69,18 +70,14 @@
                                 <option value="Konghucu">Konghucu</option>
                             </select>
                         </div>
-                        <div>
+                        <div class="form-group">
                             <label for="prodi_id" class="block mb-2 text-sm font-medium text-gray-900">Program Studi</label>
-                            <select name="prodi_id" id="prodi_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
+                            <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" id="prodi_id" name="prodi_id" required>
                                 <option value="">Pilih Program Studi</option>
                                 @foreach($prodis as $prodi)
                                     <option value="{{ $prodi->id }}">{{ $prodi->nama }}</option>
                                 @endforeach
                             </select>
-                        </div>
-                        <div>
-                            <label for="bidang" class="block mb-2 text-sm font-medium text-gray-900">Bidang</label>
-                            <input type="text" name="bidang" id="bidang" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
                         </div>
                         <div>
                             <label for="foto" class="block mb-2 text-sm font-medium text-gray-900">Foto</label>
@@ -105,15 +102,19 @@
         const form = document.getElementById('dosenForm');
         const modalElement = document.getElementById('dosenModal');
         
-        // Reset form when modal is hidden
-        modalElement.addEventListener('hidden.bs.modal', function () {
+        function closeModal() {
+            modalElement.classList.add('hidden');
             form.reset();
             document.getElementById('methodField').innerHTML = '';
             form.action = "{{ route('admin.dosen.store') }}";
             document.getElementById('modalTitle').textContent = 'Tambah Dosen';
             document.getElementById('password').required = true;
-        });
+        }
 
+        function showModal() {
+            modalElement.classList.remove('hidden');
+        }
+        
         // Handle form submission
         form.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -129,16 +130,11 @@
                 },
                 credentials: 'same-origin'
             })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(json => Promise.reject(json));
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     // Hide modal
-                    modal.hide();
+                    closeModal();
                     
                     // Show success message
                     alert(data.message);
@@ -147,7 +143,7 @@
                     window.location.reload();
                 } else {
                     // Show error message
-                    alert(data.message || 'Terjadi kesalahan saat menyimpan data');
+                    throw new Error(data.message || 'Terjadi kesalahan saat menyimpan data');
                 }
             })
             .catch(error => {
@@ -161,6 +157,10 @@
                 alert(errorMessage);
             });
         });
+
+        // Make closeModal function available globally
+        window.closeModal = closeModal;
+        window.showModal = showModal;
     });
 </script>
-@endpush 
+@endpush

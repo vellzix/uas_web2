@@ -72,7 +72,7 @@
                                                 value="{{ $jadwal->id }}" 
                                                 data-sks="{{ $jadwal->matakuliah->sks }}"
                                                 class="matakuliah-checkbox rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                                                {{ $jadwal->kuota <= $jadwal->krs_count ? 'disabled' : '' }}
+                                                {{ $jadwal->terisi >= $jadwal->kapasitas ? 'disabled' : '' }}
                                                 {{ in_array($jadwal->id, $selected_jadwals) ? 'checked' : '' }}>
                                         </td>
                                         <td class="px-6 py-4">{{ $jadwal->matakuliah->kode }}</td>
@@ -86,8 +86,8 @@
                                         </td>
                                         <td class="px-6 py-4">{{ $jadwal->dosen->nama }}</td>
                                         <td class="px-6 py-4">
-                                            <span class="{{ $jadwal->kuota <= $jadwal->krs_count ? 'text-red-600' : 'text-green-600' }}">
-                                                {{ $jadwal->krs_count }}/{{ $jadwal->kuota }}
+                                            <span class="{{ $jadwal->terisi >= $jadwal->kapasitas ? 'text-red-600' : 'text-green-600' }}">
+                                                {{ $jadwal->terisi }}/{{ $jadwal->kapasitas }}
                                             </span>
                                         </td>
                                     </tr>
@@ -127,10 +127,24 @@
                 
                 // Disable checkboxes if total SKS would exceed max
                 checkboxes.forEach(checkbox => {
-                    if (!checkbox.checked && (total + parseInt(checkbox.dataset.sks)) > maxSKS) {
-                        checkbox.disabled = true;
-                    } else if (!checkbox.disabled && parseInt(checkbox.closest('tr').querySelector('td:last-child').textContent.split('/')[0]) < parseInt(checkbox.closest('tr').querySelector('td:last-child').textContent.split('/')[1])) {
-                        checkbox.disabled = false;
+                    if (!checkbox.checked) {
+                        const sks = parseInt(checkbox.dataset.sks);
+                        const wouldExceedMax = (total + sks) > maxSKS;
+                        const kuotaInfo = checkbox.closest('tr').querySelector('td:last-child').textContent.split('/');
+                        const terisi = parseInt(kuotaInfo[0]);
+                        const kapasitas = parseInt(kuotaInfo[1]);
+                        const kuotaPenuh = terisi >= kapasitas;
+                        
+                        checkbox.disabled = wouldExceedMax || kuotaPenuh;
+                        
+                        // Add visual feedback
+                        if (wouldExceedMax) {
+                            checkbox.title = 'Melebihi batas maksimal SKS';
+                        } else if (kuotaPenuh) {
+                            checkbox.title = 'Kapasitas kelas penuh';
+                        } else {
+                            checkbox.title = '';
+                        }
                     }
                 });
             }

@@ -11,6 +11,7 @@ class Presensi extends Model
 
     protected $fillable = [
         'jadwal_id',
+        'matakuliah_id',
         'mahasiswa_id',
         'pertemuan_ke',
         'tanggal',
@@ -19,12 +20,13 @@ class Presensi extends Model
     ];
 
     protected $casts = [
-        'tanggal' => 'datetime',
+        'tanggal' => 'date',
+        'pertemuan_ke' => 'integer',
     ];
 
-    public function jadwal()
+    public function matakuliah()
     {
-        return $this->belongsTo(Jadwal::class);
+        return $this->belongsTo(Matakuliah::class);
     }
 
     public function mahasiswa()

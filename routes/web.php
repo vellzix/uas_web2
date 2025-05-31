@@ -16,6 +16,9 @@ use App\Http\Controllers\Admin\DosenController as AdminDosenController;
 use App\Http\Controllers\Admin\MataKuliahController as AdminMataKuliahController;
 use App\Http\Controllers\Admin\PengumumanController as AdminPengumumanController;
 use App\Http\Controllers\Admin\PeriodeAkademikController;
+use App\Http\Controllers\Admin\JadwalController;
+use App\Http\Controllers\Dosen\PresensiController;
+use App\Http\Controllers\Dosen\NilaiController;
 // Route::get('/', function () {
 //     return view('welcome');
 // });
@@ -57,14 +60,27 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('pengumuman', AdminPengumumanController::class);
         Route::resource('periode-akademik', PeriodeAkademikController::class);
         Route::get('/ruangan', [AdminController::class, 'manageRuangan'])->name('ruangan.index');
+        
+        // Jadwal routes
+        Route::get('/jadwal/create', [JadwalController::class, 'create'])->name('jadwal.create');
+        Route::post('/jadwal', [JadwalController::class, 'store'])->name('jadwal.store');
     });
 
     // Dosen routes
     Route::middleware(['role:dosen'])->prefix('dosen')->name('dosen.')->group(function () {
         Route::get('/dashboard', [DosenDashboardController::class, 'index'])->name('dashboard');
         Route::get('/jadwal', [DosenController::class, 'jadwalMengajar'])->name('jadwal');
-        Route::get('/input-nilai/{id}', [DosenController::class, 'inputNilai'])->name('nilai.input');
-        Route::post('/simpan-nilai', [DosenController::class, 'simpanNilai'])->name('nilai.store');
+        
+        // Nilai routes
+        Route::get('/nilai', [NilaiController::class, 'index'])->name('nilai.index');
+        Route::get('/nilai/{jadwal}', [NilaiController::class, 'show'])->name('nilai.show');
+        Route::post('/nilai/{jadwal}', [NilaiController::class, 'store'])->name('nilai.store');
+        
+        // Presensi routes
+        Route::get('/presensi', [PresensiController::class, 'index'])->name('presensi.index');
+        Route::get('/presensi/{jadwal}', [PresensiController::class, 'show'])->name('presensi.show');
+        Route::post('/presensi/{jadwal}', [PresensiController::class, 'store'])->name('presensi.store');
+        Route::get('/presensi/{jadwal}/rekap', [PresensiController::class, 'rekap'])->name('presensi.rekap');
     });
 
     // Mahasiswa routes

@@ -28,9 +28,21 @@
                         <x-nav-link :href="route('admin.periode-akademik.index')" :active="request()->routeIs('admin.periode-akademik.*')">
                             {{ __('Periode Akademik') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('admin.jadwal.create')" :active="request()->routeIs('admin.jadwal.*')">
+                            {{ __('Jadwal Kuliah') }}
+                        </x-nav-link>
                     @elseif(auth()->user()->role === 'dosen')
                         <x-nav-link :href="route('dosen.dashboard')" :active="request()->routeIs('dosen.dashboard')">
                             {{ __('Dashboard') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('dosen.jadwal')" :active="request()->routeIs('dosen.jadwal')">
+                            {{ __('Jadwal Mengajar') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('dosen.nilai.index')" :active="request()->routeIs('dosen.nilai.*')">
+                            {{ __('Input Nilai') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('dosen.presensi.index')" :active="request()->routeIs('dosen.presensi.*')">
+                            {{ __('Presensi') }}
                         </x-nav-link>
                     @elseif(auth()->user()->role === 'mahasiswa')
                         <x-nav-link :href="route('mahasiswa.dashboard')" :active="request()->routeIs('mahasiswa.dashboard')">

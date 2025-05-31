@@ -13,6 +13,9 @@ class Nilai extends Model
 
     protected $fillable = [
         'krs_id',
+        'nilai_uts',
+        'nilai_uas',
+        'nilai_tugas',
         'nilai_angka',
         'nilai_huruf',
         'nilai_indeks',
@@ -20,13 +23,16 @@ class Nilai extends Model
     ];
 
     protected $casts = [
+        'nilai_uts' => 'decimal:2',
+        'nilai_uas' => 'decimal:2',
+        'nilai_tugas' => 'decimal:2',
         'nilai_angka' => 'decimal:2',
         'nilai_indeks' => 'decimal:2'
     ];
 
     public function krs()
     {
-        return $this->belongsTo(KRS::class);
+        return $this->belongsTo(KRS::class, 'krs_id');
     }
 
     public function mahasiswa()

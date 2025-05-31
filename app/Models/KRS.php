@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class KRS extends Model
+class Krs extends Model
 {
     use HasFactory;
 
@@ -14,7 +14,8 @@ class KRS extends Model
     protected $fillable = [
         'mahasiswa_id',
         'jadwal_id',
-        'periode_akademik_id'
+        'periode_akademik_id',
+        'status'
     ];
 
     public function mahasiswa()

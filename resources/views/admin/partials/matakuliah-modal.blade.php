@@ -5,10 +5,10 @@
         <div class="relative bg-white rounded-lg shadow">
             <!-- Modal header -->
             <div class="flex items-start justify-between p-4 border-b rounded-t">
-                <h3 class="text-xl font-semibold text-gray-900">
+                <h3 class="text-xl font-semibold text-gray-900" id="modalTitle">
                     Tambah Mata Kuliah
                 </h3>
-                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center" data-modal-hide="matakuliahModal">
+                <button type="button" onclick="closeModal()" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center">
                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
                     </svg>
@@ -16,8 +16,9 @@
                 </button>
             </div>
             <!-- Modal body -->
-            <form action="{{ route('admin.matakuliah.store') }}" method="POST">
+            <form id="matakuliahForm" action="{{ route('admin.matakuliah.store') }}" method="POST">
                 @csrf
+                <div id="methodField"></div>
                 <div class="p-6 space-y-6">
                     <div class="grid grid-cols-2 gap-4">
                         <div>
@@ -45,6 +46,13 @@
                                 @endforeach
                             </select>
                         </div>
+                        <div id="statusField" style="display: none;">
+                            <label for="status" class="block mb-2 text-sm font-medium text-gray-900">Status</label>
+                            <select name="status" id="status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
+                                <option value="aktif">Aktif</option>
+                                <option value="nonaktif">Non-aktif</option>
+                            </select>
+                        </div>
                         <div class="col-span-2">
                             <label for="deskripsi" class="block mb-2 text-sm font-medium text-gray-900">Deskripsi</label>
                             <textarea name="deskripsi" id="deskripsi" rows="3" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></textarea>
@@ -54,45 +62,9 @@
                 <!-- Modal footer -->
                 <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b">
                     <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Simpan</button>
-                    <button type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10" data-modal-hide="matakuliahModal">Batal</button>
+                    <button type="button" onclick="closeModal()" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10">Batal</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
-@push('scripts')
-<script>
-    function openMatakuliahModal() {
-        document.getElementById('matakuliahModal').classList.remove('hidden');
-        document.getElementById('matakuliahModalTitle').textContent = 'Tambah Mata Kuliah';
-        document.getElementById('matakuliahForm').reset();
-        document.getElementById('matakuliahForm').action = "{{ route('admin.matakuliah.store') }}";
-        document.getElementById('matakuliahMethodField').innerHTML = '';
-    }
-
-    function closeMatakuliahModal() {
-        document.getElementById('matakuliahModal').classList.add('hidden');
-    }
-
-    function editMatakuliah(id) {
-        fetch(`/admin/matakuliah/${id}/edit`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('matakuliahModalTitle').textContent = 'Edit Mata Kuliah';
-                document.getElementById('kode').value = data.kode;
-                document.getElementById('nama').value = data.nama;
-                document.getElementById('sks').value = data.sks;
-                document.getElementById('semester').value = data.semester;
-                document.getElementById('prodi_id').value = data.prodi_id;
-                document.getElementById('status').value = data.status;
-                document.getElementById('deskripsi').value = data.deskripsi;
-                
-                document.getElementById('matakuliahForm').action = `/admin/matakuliah/${id}`;
-                document.getElementById('matakuliahMethodField').innerHTML = '@method("PUT")';
-                
-                document.getElementById('matakuliahModal').classList.remove('hidden');
-            });
-    }
-</script>
-@endpush 

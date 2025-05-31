@@ -4,7 +4,6 @@
             {{ __('Dashboard Dosen') }}
         </h2>
     </x-slot>
-
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Info Dosen -->
@@ -26,6 +25,44 @@
                             <p class="text-gray-600">Bidang: {{ $dosen->bidang }}</p>
                             <p class="text-gray-600">Program Studi: {{ $dosen->prodi->nama }}</p>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold mb-4">Menu Cepat</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <a href="{{ route('dosen.jadwal') }}" class="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100">
+                            <svg class="h-6 w-6 text-indigo-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <div>
+                                <h4 class="font-medium">Jadwal Mengajar</h4>
+                                <p class="text-sm text-gray-500">Lihat jadwal mengajar Anda</p>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('dosen.presensi.index') }}" class="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100">
+                            <svg class="h-6 w-6 text-indigo-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                            <div>
+                                <h4 class="font-medium">Presensi</h4>
+                                <p class="text-sm text-gray-500">Kelola presensi mahasiswa</p>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('dosen.nilai.index') }}" class="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100">
+                            <svg class="h-6 w-6 text-indigo-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                            <div>
+                                <h4 class="font-medium">Input Nilai</h4>
+                                <p class="text-sm text-gray-500">Input nilai mahasiswa</p>
+                            </div>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -86,20 +123,39 @@
                     </div>
                 </div>
 
-                <!-- Tugas yang Perlu Dinilai -->
+                <!-- Tugas Pending -->
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
-                        <h3 class="text-lg font-semibold mb-4">Tugas yang Perlu Dinilai</h3>
-                        <div class="space-y-4">
-                            @forelse($tugas_pending as $tugas)
-                            <div class="border-l-4 border-yellow-500 pl-4">
-                                <div class="text-lg font-medium">{{ $tugas->judul }}</div>
-                                <div class="text-sm text-gray-600">{{ $tugas->jadwal->matakuliah->nama }}</div>
-                                <div class="text-sm text-gray-500">{{ $tugas->tugasMahasiswa->where('status', 'submitted')->count() }} mahasiswa menunggu penilaian</div>
-                            </div>
-                            @empty
-                            <p class="text-gray-500 text-center">Tidak ada tugas yang perlu dinilai</p>
-                            @endforelse
+                        <h3 class="text-lg font-semibold mb-4">Tugas Pending</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mata Kuliah</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tugas</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    @forelse($tugas_pending as $tugas)
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">{{ $tugas->jadwal->matakuliah->nama }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">{{ $tugas->judul }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">{{ $tugas->deadline->format('d/m/Y H:i') }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                Belum Dinilai
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">Tidak ada tugas pending</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>

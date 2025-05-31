@@ -117,13 +117,17 @@
         // Delete confirmation
         function deleteMahasiswa(id) {
             if (confirm('Apakah Anda yakin ingin menghapus mahasiswa ini?')) {
+                const formData = new FormData();
+                formData.append('_method', 'DELETE');
+                formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+
                 fetch(`/admin/mahasiswa/${id}`, {
-                    method: 'DELETE',
+                    method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
+                    body: formData,
                     credentials: 'same-origin'
                 })
                 .then(response => {

@@ -30,12 +30,11 @@ class KRSController extends Controller
         $total_sks = $mahasiswa->calculateTotalSKS();
         $max_sks = $this->getMaxSKS($ipk);
         
-        // Get available jadwal
+        // Get available jadwal with eager loading
         $jadwals = Jadwal::with(['matakuliah', 'dosen'])
             ->where('semester', $periode->semester)
             ->where('tahun_akademik', $periode->tahun_akademik)
             ->where('status', 'aktif')
-            ->withCount('krs')
             ->get();
             
         // Get already selected jadwals
@@ -67,8 +66,8 @@ class KRSController extends Controller
         $jadwal_ids = $request->input('jadwal_ids', []);
         
         // Validate total SKS
-        $total_sks = Jadwal::whereIn('id', $jadwal_ids)
-            ->join('matakuliahs', 'jadwals.matakuliah_id', '=', 'matakuliahs.id')
+        $total_sks = Jadwal::whereIn('jadwal.id', $jadwal_ids)
+            ->join('matakuliahs', 'jadwal.matakuliah_id', '=', 'matakuliahs.id')
             ->sum('matakuliahs.sks');
             
         $max_sks = $this->getMaxSKS($mahasiswa->calculateIPK());
@@ -79,7 +78,7 @@ class KRSController extends Controller
         }
         
         // Validate jadwal conflicts
-        $jadwals = Jadwal::whereIn('id', $jadwal_ids)->get();
+        $jadwals = Jadwal::whereIn('jadwal.id', $jadwal_ids)->get();
         foreach ($jadwals as $jadwal1) {
             foreach ($jadwals as $jadwal2) {
                 if ($jadwal1->id !== $jadwal2->id && $this->isJadwalConflict($jadwal1, $jadwal2)) {
@@ -89,11 +88,11 @@ class KRSController extends Controller
             }
         }
         
-        // Validate kuota
+        // Validate kapasitas
         foreach ($jadwals as $jadwal) {
-            if ($jadwal->krs_count >= $jadwal->kuota) {
+            if ($jadwal->terisi >= $jadwal->kapasitas) {
                 return redirect()->back()
-                    ->with('error', "Kuota untuk mata kuliah {$jadwal->matakuliah->nama} sudah penuh.");
+                    ->with('error', "Kapasitas untuk mata kuliah {$jadwal->matakuliah->nama} sudah penuh.");
             }
         }
         
@@ -105,13 +104,17 @@ class KRSController extends Controller
                 ->where('periode_akademik_id', $periode->id)
                 ->delete();
             
-            // Create new KRS entries
+            // Create new KRS entries and update terisi count
             foreach ($jadwal_ids as $jadwal_id) {
                 KRS::create([
                     'mahasiswa_id' => $mahasiswa->id,
                     'jadwal_id' => $jadwal_id,
-                    'periode_akademik_id' => $periode->id
+                    'periode_akademik_id' => $periode->id,
+                    'status' => 'disetujui'
                 ]);
+                
+                // Increment terisi count
+                Jadwal::where('id', $jadwal_id)->increment('terisi');
             }
             
             DB::commit();

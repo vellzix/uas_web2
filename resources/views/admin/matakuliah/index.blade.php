@@ -85,24 +85,45 @@
 
     @push('scripts')
     <script>
+        // Initialize modal functionality
+        const modal = document.getElementById('matakuliahModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const form = document.getElementById('matakuliahForm');
+        const methodField = document.getElementById('methodField');
+        const statusField = document.getElementById('statusField');
+
+        // Add event listeners for modal triggers
+        document.querySelectorAll('[data-modal-toggle="matakuliahModal"]').forEach(button => {
+            button.addEventListener('click', openModal);
+        });
+
+        document.querySelectorAll('[data-modal-hide="matakuliahModal"]').forEach(button => {
+            button.addEventListener('click', closeModal);
+        });
+
         function openModal() {
-            document.getElementById('matakuliahModal').classList.remove('hidden');
-            document.getElementById('modalTitle').textContent = 'Tambah Mata Kuliah';
-            document.getElementById('matakuliahForm').reset();
-            document.getElementById('matakuliahForm').action = "{{ route('admin.matakuliah.store') }}";
-            document.getElementById('methodField').innerHTML = '';
-            document.getElementById('statusField').style.display = 'none';
+            modal.classList.remove('hidden');
+            modalTitle.textContent = 'Tambah Mata Kuliah';
+            form.reset();
+            form.action = "{{ route('admin.matakuliah.store') }}";
+            methodField.innerHTML = '';
+            statusField.style.display = 'none';
         }
 
         function closeModal() {
-            document.getElementById('matakuliahModal').classList.add('hidden');
+            modal.classList.add('hidden');
         }
 
         function editMatakuliah(id) {
             fetch(`/admin/matakuliah/${id}/edit`)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    document.getElementById('modalTitle').textContent = 'Edit Mata Kuliah';
+                    modalTitle.textContent = 'Edit Mata Kuliah';
                     document.getElementById('kode').value = data.kode;
                     document.getElementById('nama').value = data.nama;
                     document.getElementById('sks').value = data.sks;
@@ -110,14 +131,32 @@
                     document.getElementById('prodi_id').value = data.prodi_id;
                     document.getElementById('deskripsi').value = data.deskripsi;
                     document.getElementById('status').value = data.status;
-                    document.getElementById('statusField').style.display = 'block';
+                    statusField.style.display = 'block';
                     
-                    document.getElementById('matakuliahForm').action = `/admin/matakuliah/${id}`;
-                    document.getElementById('methodField').innerHTML = '@method("PUT")';
+                    form.action = `/admin/matakuliah/${id}`;
+                    methodField.innerHTML = '@method("PUT")';
                     
-                    document.getElementById('matakuliahModal').classList.remove('hidden');
+                    modal.classList.remove('hidden');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat mengambil data mata kuliah');
                 });
         }
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                closeModal();
+            }
+        });
     </script>
     @endpush
 </x-app-layout> 

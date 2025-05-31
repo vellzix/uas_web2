@@ -41,7 +41,6 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Program Studi</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bidang</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                                 </tr>
@@ -53,7 +52,6 @@
                                     <td class="px-6 py-4 whitespace-nowrap">{{ $dosen->nama }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">{{ $dosen->user->email }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">{{ $dosen->prodi->nama }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">{{ $dosen->bidang }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $dosen->status === 'aktif' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                             {{ ucfirst($dosen->status) }}
@@ -80,35 +78,31 @@
 
     @push('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get modal instance
-            const dosenModal = window.getModal('dosenModal');
-            if (!dosenModal) {
-                console.error('Failed to initialize dosen modal');
-                return;
-            }
-
-            // Add form submit handler
-            const form = document.getElementById('dosenForm');
-            form.addEventListener('submit', handleFormSubmit);
-
-            // Add modal hide handler
-            const modalElement = document.getElementById('dosenModal');
-            modalElement.addEventListener('hide.bs.modal', function () {
-                form.reset();
-                document.getElementById('methodField').innerHTML = '';
-                form.action = "{{ route('admin.dosen.store') }}";
+        function openModal(isEdit = false) {
+            const modal = document.getElementById('dosenModal');
+            modal.classList.remove('hidden');
+            
+            if (!isEdit) {
                 document.getElementById('modalTitle').textContent = 'Tambah Dosen';
+                document.getElementById('dosenForm').reset();
+                document.getElementById('dosenForm').action = "{{ route('admin.dosen.store') }}";
+                document.getElementById('methodField').innerHTML = '';
                 document.getElementById('password').required = true;
-            });
-        });
+            }
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('dosenModal');
+            modal.classList.add('hidden');
+            document.getElementById('dosenForm').reset();
+        }
 
         function handleFormSubmit(e) {
             e.preventDefault();
             
-            const formData = new FormData(this);
+            const formData = new FormData(e.target);
             
-            fetch(this.action, {
+            fetch(e.target.action, {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -126,7 +120,7 @@
             .then(data => {
                 if (data.success) {
                     // Hide modal
-                    window.getModal('dosenModal').hide();
+                    closeModal();
                     
                     // Show success message
                     alert(data.message);
@@ -150,18 +144,10 @@
             });
         }
 
-        function openModal() {
-            document.getElementById('modalTitle').textContent = 'Tambah Dosen';
-            document.getElementById('dosenForm').reset();
-            document.getElementById('dosenForm').action = "{{ route('admin.dosen.store') }}";
-            document.getElementById('methodField').innerHTML = '';
-            document.getElementById('password').required = true;
-            window.getModal('dosenModal').show();
-        }
-
-        function closeModal() {
-            window.getModal('dosenModal').hide();
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('dosenForm');
+            form.addEventListener('submit', handleFormSubmit);
+        });
 
         function editDosen(id) {
             fetch(`/admin/dosen/${id}/edit`, {
@@ -177,6 +163,10 @@
                 return response.json();
             })
             .then(data => {
+                // Open modal first in edit mode
+                openModal(true);
+                
+                // Set modal title and form data
                 document.getElementById('modalTitle').textContent = 'Edit Dosen';
                 document.getElementById('nip').value = data.nip;
                 document.getElementById('nama').value = data.nama;
@@ -187,7 +177,7 @@
                 document.getElementById('jenis_kelamin').value = data.jenis_kelamin;
                 document.getElementById('agama').value = data.agama;
                 document.getElementById('prodi_id').value = data.prodi_id;
-                document.getElementById('bidang').value = data.bidang;
+                document.getElementById('matakuliah_id').value = data.matakuliah_id;
                 
                 // Make password optional for edit
                 document.getElementById('password').required = false;
@@ -196,9 +186,6 @@
                 const form = document.getElementById('dosenForm');
                 form.action = `/admin/dosen/${id}`;
                 document.getElementById('methodField').innerHTML = '@method("PUT")';
-                
-                // Show modal
-                window.getModal('dosenModal').show();
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -209,18 +196,21 @@
         // Delete confirmation with AJAX
         function deleteDosen(id) {
             if (confirm('Apakah Anda yakin ingin menghapus dosen ini?')) {
+                const formData = new FormData();
+                formData.append('_method', 'DELETE');
+                formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+                
                 fetch(`/admin/dosen/${id}`, {
-                    method: 'DELETE',
+                    method: 'POST',
+                    body: formData,
                     headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
                     credentials: 'same-origin'
                 })
                 .then(response => {
                     if (!response.ok) {
-                        return response.json().then(json => Promise.reject(json));
+                        throw new Error('Network response was not ok');
                     }
                     return response.json();
                 })
@@ -233,13 +223,7 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    let errorMessage = 'Terjadi kesalahan saat menghapus data';
-                    if (error.errors) {
-                        errorMessage = Object.values(error.errors).flat().join('\n');
-                    } else if (error.message) {
-                        errorMessage = error.message;
-                    }
-                    alert(errorMessage);
+                    alert('Terjadi kesalahan saat menghapus data');
                 });
             }
         }

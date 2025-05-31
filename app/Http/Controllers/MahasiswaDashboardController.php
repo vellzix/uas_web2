@@ -68,15 +68,26 @@ class MahasiswaDashboardController extends Controller
         // Hitung persentase kehadiran semester ini
         $semester_aktif = $periode ? $periode->semester : null;
         try {
-            $presensi = Presensi::whereHas('jadwal.krs', function($query) use ($mahasiswa, $semester_aktif) {
-                $query->where('mahasiswa_id', $mahasiswa->id)
-                      ->where('semester', $semester_aktif);
-            })->get();
+            // Get all matakuliah_ids from student's KRS
+            $matakuliah_ids = DB::table('krs')
+                ->join('jadwal', 'krs.jadwal_id', '=', 'jadwal.id')
+                ->where('krs.mahasiswa_id', $mahasiswa->id)
+                ->where('jadwal.semester', $semester_aktif)
+                ->pluck('jadwal.matakuliah_id');
+
+            // Get presensi records for these matakuliah
+            $presensi = Presensi::where('mahasiswa_id', $mahasiswa->id)
+                ->whereIn('matakuliah_id', $matakuliah_ids)
+                ->get();
 
             $total_pertemuan = $presensi->count();
             $hadir = $presensi->where('status', 'hadir')->count();
             $kehadiran_percentage = $total_pertemuan > 0 ? round(($hadir / $total_pertemuan) * 100) : 0;
         } catch (\Exception $e) {
+            \Log::error('Error calculating attendance:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             $kehadiran_percentage = 0;
         }
 
